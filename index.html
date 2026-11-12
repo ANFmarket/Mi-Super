@@ -171,64 +171,63 @@ function fillFromSpeech(transcript) {
   }
 }
 
-const recognition = Recognition ? new Recognition() : null;
-
-if (recognition) {
-  recognition.lang = 'es-MX';
-  recognition.continuous = false;
-  recognition.interimResults = false;
-}
-
-let dictationTimer;
-let waitingForSpeech = false;
-
-function finishDictation() {
-  clearTimeout(dictationTimer);
-  waitingForSpeech = false;
-  dictate.disabled = false;
-}
-
-if (recognition) {
-  recognition.onresult = event => {
-    if (!waitingForSpeech) return;
-    waitingForSpeech = false;
-    fillFromSpeech(event.results[event.resultIndex][0].transcript);
-  };
-  recognition.onerror = event => {
-    if (!dictate.disabled) return;
-    waitingForSpeech = false;
-    const detail = event.message ? ' — ' + event.message : '';
-    get('status').textContent = 'Error de dictado (' + event.error + ')' + detail;
-  };
-  recognition.onend = () => {
-    if (waitingForSpeech) {
-      get('status').textContent = 'El dictado terminó sin texto. Toca Dictar producto para reintentar.';
-    }
-    finishDictation();
-  };
-}
-
 dictate.addEventListener('click', () => {
-  if (!recognition) {
+  if (!Recognition) {
     get('status').textContent = 'El navegador no tiene dictado disponible. Puedes escribir el producto.';
     return;
   }
 
-  waitingForSpeech = true;
+  const recognition = new Recognition();
+  recognition.lang = 'es-MX';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  let receivedResult = false;
+  let timer;
+
+  function finish() {
+    clearTimeout(timer);
+    recognition.onresult = null;
+    recognition.onerror = null;
+    recognition.onend = null;
+    dictate.disabled = false;
+  }
+
+  recognition.onresult = event => {
+    if (receivedResult) return;
+    receivedResult = true;
+    fillFromSpeech(event.results[event.resultIndex][0].transcript);
+    recognition.abort();
+  };
+
+  recognition.onerror = event => {
+    if (!receivedResult) {
+      const detail = event.message ? ' — ' + event.message : '';
+      get('status').textContent = 'Error de dictado (' + event.error + ')' + detail;
+      receivedResult = true;
+    }
+  };
+
+  recognition.onend = () => {
+    if (!receivedResult) {
+      get('status').textContent = 'El dictado terminó sin texto. Toca Dictar producto para reintentar.';
+    }
+    finish();
+  };
+
   dictate.disabled = true;
   get('status').textContent = 'Escuchando…';
-  dictationTimer = setTimeout(() => {
-    if (waitingForSpeech) {
+  timer = setTimeout(() => {
+    if (!receivedResult) {
       get('status').textContent = 'El dictado agotó el tiempo. Toca Dictar producto para reintentar.';
     }
-    finishDictation();
+    finish();
     recognition.abort();
   }, 15000);
 
   try {
     recognition.start();
   } catch (error) {
-    finishDictation();
+    finish();
     get('status').textContent = 'No se pudo iniciar el dictado (' + error.name + '): ' + error.message;
   }
 });
