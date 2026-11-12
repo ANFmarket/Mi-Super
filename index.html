@@ -19,7 +19,7 @@
 </div>
 <div class="actions"><button class="primary" id="save">Agregar</button><button id="dictate" type="button">Dictar producto</button><button id="cancel" type="button" hidden>Cancelar</button></div>
 </form>
-<p role="status" id="status"></p>
+<p role="status" id="status">Dictado v4</p>
 <h2>Lista de compras</h2>
 <p id="empty">Agrega el primer producto de tu lista.</p>
 <ul id="items"></ul>
@@ -171,7 +171,13 @@ function fillFromSpeech(transcript) {
   }
 }
 
+let finishListening;
+
 dictate.addEventListener('click', () => {
+  if (finishListening) {
+    finishListening();
+    return;
+  }
   if (!Recognition) {
     get('status').textContent = 'El navegador no tiene dictado disponible. Puedes escribir el producto.';
     return;
@@ -189,6 +195,9 @@ dictate.addEventListener('click', () => {
     recognition.onresult = null;
     recognition.onerror = null;
     recognition.onend = null;
+    recognition.onspeechend = null;
+    finishListening = null;
+    dictate.textContent = 'Dictar producto';
     dictate.disabled = false;
   }
 
@@ -214,7 +223,14 @@ dictate.addEventListener('click', () => {
     finish();
   };
 
-  dictate.disabled = true;
+  finishListening = () => {
+    if (dictate.disabled) return;
+    dictate.disabled = true;
+    get('status').textContent = 'Procesando dictado…';
+    recognition.stop();
+  };
+  recognition.onspeechend = finishListening;
+  dictate.textContent = 'Terminar dictado';
   get('status').textContent = 'Escuchando…';
   timer = setTimeout(() => {
     if (!receivedResult) {
