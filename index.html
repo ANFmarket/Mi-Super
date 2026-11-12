@@ -178,16 +178,20 @@ dictate.addEventListener('click', () => {
   const recognition = new Recognition();
   recognition.lang = 'es-MX';
   recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
-  recognition.onerror = () => {
-    get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
+  recognition.onerror = event => {
+    dictate.disabled = false;
+    const code = event.error || 'sin-código';
+    const detail = event.message ? ' — ' + event.message : '';
+    get('status').textContent = 'Error de dictado (' + code + ')' + detail;
   };
   recognition.onend = () => { dictate.disabled = false; };
   try {
     recognition.start();
     dictate.disabled = true;
     get('status').textContent = 'Escuchando…';
-  } catch {
-    get('status').textContent = 'No se pudo iniciar el dictado.';
+  } catch (error) {
+    dictate.disabled = false;
+    get('status').textContent = 'No se pudo iniciar el dictado (' + error.name + '): ' + error.message;
   }
 });
 render();
