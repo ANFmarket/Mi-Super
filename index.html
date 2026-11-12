@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es-MX">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi Súper</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#185841">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eff3ee;color:#19352c;font:16px system-ui,sans-serif}main{max-width:560px;margin:auto;padding:32px 20px}h1{font-size:2.5rem;margin:0 0 18px}h2{font-size:1.2rem}header,li,.actions{display:flex;align-items:center;justify-content:space-between;gap:12px}output{font-weight:700}form,li{background:white;border:1px solid #d2ddd4;border-radius:14px;padding:14px;margin-bottom:8px}label{display:grid;gap:4px}input,button{font:inherit;padding:9px;border:1px solid #9eafa5;border-radius:8px;min-width:0}button{cursor:pointer;color:#19352c;background:#fff}.primary{background:#185841;color:white}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}ul{list-style:none;padding:0}li label{display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}li .actions{gap:4px}small{display:block;color:#496359}[hidden]{display:none!important}
+</style>
+<main>
+<header><h1>Mi Súper</h1><div><small>Total estimado</small><output id="total"></output></div></header>
+<form id="entry">
+<label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche"></label>
+<div class="fields">
+<label>Cantidad<input id="quantity" type="number" min=".01" step=".01" max="99999" required value="1"></label>
+<label>Precio unitario (opcional)<input id="price" type="number" min="0" step=".01" max="999999" placeholder="$"></label>
+</div>
+<div class="actions"><button class="primary" id="save">Agregar</button><button id="dictate" type="button">Dictar producto</button><button id="cancel" type="button" hidden>Cancelar</button></div>
+</form>
+<p role="status" id="status"></p>
+<h2>Lista de compras</h2>
+<p id="empty">Agrega el primer producto de tu lista.</p>
+<ul id="items"></ul>
+</main>
+<script>
+const get = id => document.getElementById(id);
+const key = 'mi-super-lista-v1';
+const money = new Intl.NumberFormat('es-MX', {style:'currency',currency:'MXN'});
+let items = [];
+let editing = null;
+try { items = JSON.parse(localStorage.getItem(key) || '[]'); }
+catch { get('status').textContent = 'No se pudo recuperar la lista guardada.'; }
+
+function render() {
+  get('total').value = money.format(items.reduce((sum,item) => sum + Math.round(item.quantity * (item.cents ?? 0)),0) / 100);
+  get('empty').hidden = items.length > 0;
+  get('items').replaceChildren(...items.map(item => {
+    const row = document.createElement('li');
+    const label = document.createElement('label');
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = item.bought;
+    check.addEventListener('change', () => update(items.map(product => product.id === item.id ? {...product,bought:check.checked} : product)));
+    const detail = document.createElement('span');
+    const description = document.createElement('small');
+    detail.textContent = item.name;
+    description.textContent = item.quantity + (item.cents === null ? '' : ' × ' + money.format(item.cents / 100));
+    detail.append(description);
+    label.append(check, detail);
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const edit = document.createElement('button');
+    edit.textContent = 'Editar';
+    edit.addEventListener('click', () => {
+      editing = item.id;
+      get('name').value = item.name;
+      get('quantity').value = item.quantity;
+      get('price').value = item.cents === null ? '' : item.cents / 100;
+      get('save').textContent = 'Guardar';
+      get('cancel').hidden = false;
+      get('name').focus();
+    });
+    const remove = document.createElement('button');
+    remove.textContent = 'Quitar';
+    remove.addEventListener('click', () => {
+      update(items.filter(product => product.id !== item.id));
+      if (editing === item.id) resetForm();
+    });
+    actions.append(edit,remove);
+    row.append(label,actions);
+    return row;
+  }));
+}
+
+function update(next) {
+  items = next;
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+    get('status').textContent = '';
+  } catch {
+    get('status').textContent = 'Los cambios solo estarán disponibles mientras esta página siga abierta.';
+  }
+  render();
+}
+
+function resetForm() {
+  editing = null;
+  get('entry').reset();
+  get('save').textContent = 'Agregar';
+  get('cancel').hidden = true;
+}
+
+get('cancel').addEventListener('click', resetForm);
+get('entry').addEventListener('submit', event => {
+  event.preventDefault();
+  const name = get('name').value.trim();
+  if (!name) {
+    get('status').textContent = 'Escribe el nombre del producto.';
+    get('name').focus();
+    return;
+  }
+  const quantity = get('quantity').valueAsNumber;
+  const cents = get('price').value === '' ? null : Math.round(get('price').valueAsNumber * 100);
+  const fields = {name,quantity,cents};
+  update(editing === null
+    ? [...items,{...fields,id:Date.now().toString(36) + Math.random().toString(36).slice(2),bought:false}]
+    : items.map(item => item.id === editing ? {...item,...fields} : item));
+  resetForm();
+  get('name').focus();
+});
+const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const dictate = get('dictate');
+const units = ['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve'];
+const tens = ['','diez','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+const teens = ['diez','once','doce','trece','catorce','quince','dieciseis','diecisiete','dieciocho','diecinueve'];
+const numbers = new Map([['un',1],['una',1],['cien',100]]);
+units.forEach((word,value) => numbers.set(word,value));
+teens.forEach((word,value) => numbers.set(word,value+10));
+for (let ten=2; ten<tens.length; ten++) {
+  numbers.set(tens[ten],ten*10);
+  for (let unit=1; unit<10; unit++) {
+    numbers.set(ten===2 ? 'veinti'+units[unit] : tens[ten]+' y '+units[unit],ten*10+unit);
+  }
+}
+function spokenNumber(text) {
+  const normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if (/^\d+(?:[.,]\d+)?$/.test(normalized)) return Number(normalized.replace(',','.'));
+  return numbers.get(normalized);
+}
+function fillFromSpeech(transcript) {
+  const command = /(?:^|[,.;]\s*|\s+)(?:agregar?|agr[eé]galo|añadir) a la lista[.!?]*$/i;
+  const shouldAdd = command.test(transcript.trim());
+  const phrase = transcript.trim().replace(command, '').replace(/[.!?]+$/,'').trim();
+  if (!phrase) {
+    if (shouldAdd && editing === null && get('name').value.trim()) {
+      get('entry').requestSubmit();
+    } else {
+      get('status').textContent = 'Primero dicta o escribe un producto.';
+    }
+    return;
+  }
+  get('quantity').value = '1';
+  get('price').value = '';
+  const parts = phrase.match(/^(.*?)\s+a\s+(.+?)(?:\s+pesos?)?(?:\s+(?:cada uno|por unidad))?$/i)
+    || phrase.match(/^(.*?)\s+\$\s*(\d+(?:[.,]\d+)?)(?:\s+(?:cada uno|por unidad))?$/i);
+  const product = parts ? parts[1] : phrase;
+  const price = parts ? spokenNumber(parts[2].replace(/^\$\s*/, '')) : undefined;
+  const words = product.split(/\s+/);
+  if (/^(?:los|las)$/i.test(words[0]) && spokenNumber(words[1] || '') > 0 && words.length > 2) {
+    words.shift();
+  }
+  for (let count=Math.min(3,words.length-1); count>0; count--) {
+    const quantity = spokenNumber(words.slice(0,count).join(' '));
+    if (quantity > 0) {
+      get('quantity').value = quantity;
+      words.splice(0,count);
+      break;
+    }
+  }
+  const name = words.join(' ');
+  get('name').value = name.charAt(0).toUpperCase()+name.slice(1);
+  if (price !== undefined) get('price').value = price;
+  get('status').textContent = parts && price === undefined
+    ? 'Revisa el producto y escribe el precio.'
+    : 'Revisa los datos antes de guardar.';
+  if (shouldAdd && editing === null && (!parts || price !== undefined)) {
+    get('entry').requestSubmit();
+  }
+}
+
+dictate.addEventListener('click', () => {
+  if (!Recognition) {
+    get('status').textContent = 'El navegador no tiene dictado disponible. Puedes escribir el producto.';
+    return;
+  }
+  const recognition = new Recognition();
+  recognition.lang = 'es-MX';
+  recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
+  recognition.onerror = () => {
+    get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
+  };
+  recognition.onend = () => { dictate.disabled = false; };
+  try {
+    recognition.start();
+    dictate.disabled = true;
+    get('status').textContent = 'Escuchando…';
+  } catch {
+    get('status').textContent = 'No se pudo iniciar el dictado.';
+  }
+});
+render();
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {
+    get('status').textContent = 'No se pudo preparar el uso sin conexión.';
+  });
+}
+</script>
+</html>
