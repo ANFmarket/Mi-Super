@@ -162,10 +162,11 @@ function fillFromSpeech(transcript) {
   const name = words.join(' ');
   get('name').value = name.charAt(0).toUpperCase()+name.slice(1);
   if (price !== undefined) get('price').value = price;
-  get('status').textContent = parts && price === undefined
-    ? 'Revisa el producto y escribe el precio.'
-    : 'Revisa los datos antes de guardar.';
-  if (shouldAdd && editing === null && (!parts || price !== undefined)) {
+  if (parts && price === undefined) {
+    get('status').textContent = 'Revisa el producto y escribe el precio.';
+  } else if (editing !== null) {
+    get('status').textContent = 'Revisa los datos antes de guardar.';
+  } else {
     get('entry').requestSubmit();
   }
 }
