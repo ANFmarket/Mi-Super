@@ -170,27 +170,64 @@ function fillFromSpeech(transcript) {
   }
 }
 
+const recognition = Recognition ? new Recognition() : null;
+
+if (recognition) {
+  recognition.lang = 'es-MX';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+}
+
+let dictationTimer;
+let waitingForSpeech = false;
+
+function finishDictation() {
+  clearTimeout(dictationTimer);
+  waitingForSpeech = false;
+  dictate.disabled = false;
+}
+
+if (recognition) {
+  recognition.onresult = event => {
+    if (!waitingForSpeech) return;
+    waitingForSpeech = false;
+    fillFromSpeech(event.results[event.resultIndex][0].transcript);
+  };
+  recognition.onerror = event => {
+    if (!dictate.disabled) return;
+    waitingForSpeech = false;
+    const detail = event.message ? ' — ' + event.message : '';
+    get('status').textContent = 'Error de dictado (' + event.error + ')' + detail;
+  };
+  recognition.onend = () => {
+    if (waitingForSpeech) {
+      get('status').textContent = 'El dictado terminó sin texto. Toca Dictar producto para reintentar.';
+    }
+    finishDictation();
+  };
+}
+
 dictate.addEventListener('click', () => {
-  if (!Recognition) {
+  if (!recognition) {
     get('status').textContent = 'El navegador no tiene dictado disponible. Puedes escribir el producto.';
     return;
   }
-  const recognition = new Recognition();
-  recognition.lang = 'es-MX';
-  recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
-  recognition.onerror = event => {
-    dictate.disabled = false;
-    const code = event.error || 'sin-código';
-    const detail = event.message ? ' — ' + event.message : '';
-    get('status').textContent = 'Error de dictado (' + code + ')' + detail;
-  };
-  recognition.onend = () => { dictate.disabled = false; };
+
+  waitingForSpeech = true;
+  dictate.disabled = true;
+  get('status').textContent = 'Escuchando…';
+  dictationTimer = setTimeout(() => {
+    if (waitingForSpeech) {
+      get('status').textContent = 'El dictado agotó el tiempo. Toca Dictar producto para reintentar.';
+    }
+    finishDictation();
+    recognition.abort();
+  }, 15000);
+
   try {
     recognition.start();
-    dictate.disabled = true;
-    get('status').textContent = 'Escuchando…';
   } catch (error) {
-    dictate.disabled = false;
+    finishDictation();
     get('status').textContent = 'No se pudo iniciar el dictado (' + error.name + '): ' + error.message;
   }
 });
