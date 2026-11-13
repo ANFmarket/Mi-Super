@@ -1,4 +1,4 @@
-const cacheName = 'mi-super-pwa-v7';
+const cacheName = 'mi-super-pwa-v8';
 const assets = ['./', './index.html', './manifest.webmanifest', './cart-192.png', './cart-512.png'];
 
 self.addEventListener('install', event => {

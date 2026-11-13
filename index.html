@@ -13,9 +13,9 @@
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 20px}h1{font-size:clamp(1.7rem,5.6vw,2.15rem);letter-spacing:-.045em;margin:0;color:#3c4d58}header h1{display:flex;align-items:center;gap:10px;white-space:nowrap}header h1 img{border-radius:12px;box-shadow:0 1px 4px #a6b6bf33}h2{font-size:1.19rem;letter-spacing:-.015em;margin:24px 0 12px;color:#374a56}
 .total-card{padding:10px 14px;background:#e8f7fb;border:1px solid #c9eaf3;border-radius:15px;text-align:right;flex-shrink:0}.total-card .total-title{display:flex;align-items:center;justify-content:flex-end;gap:6px}.total-card .total-title .icon{width:17px;height:17px;color:#167fa6}.total-card small{color:#47758a;font-size:.72rem}.total-card output{display:block;font-size:1.27rem;font-weight:800;letter-spacing:-.03em;color:#167fa6;white-space:nowrap}
 form{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;box-shadow:0 5px 22px #253f4c09}label{display:grid;gap:7px;font-weight:600;font-size:.89rem}input:not([type=checkbox]),button{font:inherit;min-width:0}input:not([type=checkbox]){width:100%;height:45px;padding:10px 12px;border:1px solid #cbd6dc;border-radius:11px;background:#fff;color:#334752;outline-offset:2px}input:focus-visible,button:focus-visible{outline:3px solid #83d6ef;outline-offset:2px}input:not([type=checkbox]):focus{border-color:var(--sky)}input::placeholder{color:#9aa8b0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:14px 0 17px}
-button{cursor:pointer;border:1px solid #d3e0e6;background:#fff;color:#405765;border-radius:11px;min-height:43px;padding:10px 13px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background-color .15s,transform .12s}button:active{transform:scale(.985)}button:disabled{opacity:.58;cursor:wait}.primary{background:#229fca;color:#fff;border-color:#229fca}.primary:active{background:#177eaa}.voice{background:#e4f5fa;color:#127fa7;border-color:#bce7f3}.voice:disabled{background:#f0f3f5}.secondary{background:#f5f8fa}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}form>.actions{gap:9px}form>.actions button{flex:1 1 125px}
+button{cursor:pointer;border:1px solid #d3e0e6;background:#fff;color:#405765;border-radius:11px;min-height:43px;padding:10px 13px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background-color .15s,transform .12s}button:active{transform:scale(.985)}button:disabled{opacity:.58;cursor:wait}.voice.listening{background:#c9eef9;border-color:#5bc6e9;color:#07668a;box-shadow:0 0 0 3px #b4e8f780}.voice.listening .icon{animation:pulse 1.15s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.16);opacity:.65}}.primary{background:#229fca;color:#fff;border-color:#229fca}.primary:active{background:#177eaa}.voice{background:#e4f5fa;color:#127fa7;border-color:#bce7f3}.voice:disabled{background:#f0f3f5}.secondary{background:#f5f8fa}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}form>.actions{gap:9px}form>.actions button{flex:1 1 125px}
 .icon{width:18px;height:18px;flex-shrink:0;display:block;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}.voice .icon{width:20px;height:20px}
-#status{font-size:.9rem;color:#376e87;min-height:1.3em;margin:11px 4px 4px}#status:empty{min-height:0;margin:0}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.section-heading small{color:var(--muted);font-weight:500}#empty{color:var(--muted);background:#fff;border:1px dashed #d0dde4;border-radius:15px;padding:20px;text-align:center}
+#status{font-size:.9rem;color:#376e87;min-height:1.3em;margin:11px 4px 4px}#status:empty{min-height:0;margin:0}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.list-tools{display:flex;align-items:center;gap:10px}.list-tools button{font-size:.85rem;min-height:38px;padding:7px 10px}.section-heading small{color:var(--muted);font-weight:500}#empty{color:var(--muted);background:#fff;border:1px dashed #d0dde4;border-radius:15px;padding:20px;text-align:center}
 ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 9px #243f4c06}li label{display:flex;align-items:center;gap:11px;flex:1;min-width:0;overflow-wrap:anywhere;cursor:pointer;font-size:1rem}li label input{appearance:none;flex:0 0 23px;width:23px;height:23px;border:2px solid #a6beca;border-radius:7px;margin:0;display:grid;place-content:center;cursor:pointer}li label input:checked{background:#27a3cc;border-color:#27a3cc}li label input:checked::after{content:'✓';font-size:16px;color:#fff;font-weight:800;line-height:1}li label input:checked + span{text-decoration:line-through;text-decoration-thickness:2px;color:#91a1ab}li label span{min-width:0;font-weight:650}li label small{display:block;color:#72828c;font-size:.79rem;font-weight:400;text-decoration:none}li .actions{gap:5px;flex-wrap:nowrap}li .actions button{padding:7px;min-height:37px;min-width:37px;border-radius:10px}li .actions button .icon{width:17px;height:17px}small{display:block;color:var(--muted)}[hidden]{display:none!important}.hint{margin:0 0 16px;font-size:.89rem;color:#71818c}
 @media(max-width:430px){main{padding:19px 12px 45px}form{padding:15px}header{align-items:center}header h1 img{width:36px;height:36px}.total-card{padding:8px 10px}.total-card output{font-size:1.07rem}li{padding:10px}li .actions button{min-width:35px;padding:7px}.fields{gap:9px}}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
@@ -24,7 +24,7 @@ ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;bo
 <header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div class="total-card"><div class="total-title"><span class="icon-slot" data-icon="wallet"></span><small>Total estimado</small></div><output id="total"></output></div></header>
 <form id="entry">
 <p class="hint">Tu lista de compras, fácil y a tu manera.</p>
-<label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche"></label>
+<label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche" list="frequent-products" autocomplete="off"></label><datalist id="frequent-products"></datalist>
 <div class="fields">
 <label>Cantidad<input id="quantity" type="number" min=".01" step=".01" max="99999" required value="1"></label>
 <label>Precio unitario (opcional)<input id="price" type="number" min="0" step=".01" max="999999" placeholder="$"></label>
@@ -32,13 +32,14 @@ ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;bo
 <div class="actions"><button class="primary" id="save"><span class="icon-slot" data-icon="plus"></span><span class="button-label">Agregar</span></button><button class="voice" id="dictate" type="button"><span class="icon-slot" data-icon="mic"></span> Dictar producto</button><button class="secondary" id="cancel" type="button" hidden>Cancelar</button></div>
 </form>
 <p role="status" id="status"></p>
-<div class="section-heading"><h2>Lista de compras</h2><small id="count"></small></div>
+<div class="section-heading"><h2>Lista de compras</h2><div class="list-tools"><small id="count"></small><button id="new-purchase" type="button" class="secondary" hidden>Nueva compra</button></div></div>
 <p id="empty">Agrega el primer producto de tu lista.</p>
 <ul id="items"></ul>
 </main>
 <script>
 const get = id => document.getElementById(id);
-const key = 'mi-super-lista-v1';
+const key = 'mi-super-lista-v1'; // Mantener clave para conservar los datos existentes
+const frequentKey = 'mi-super-frecuentes-v1';
 const iconPaths = {
   wallet: '<path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h15a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a3 3 0 0 1-3-3"/><path d="M22 13h-5a2 2 0 0 0 0 4h5"/><path d="M17 15h.01"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
@@ -57,6 +58,29 @@ function setSaveLabel(label) { get('save').querySelector('.button-label').textCo
 const money = new Intl.NumberFormat('es-MX', {style:'currency',currency:'MXN'});
 let items = [];
 let editing = null;
+let frequent = {};
+try { frequent = JSON.parse(localStorage.getItem(frequentKey) || '{}') || {}; }
+catch { frequent = {}; }
+function normalizedName(name) {
+  return String(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+}
+function updateFrequentList() {
+  const names = Object.values(frequent).filter(x => x && x.name).sort((a,b)=>(b.uses||0)-(a.uses||0)).slice(0,25);
+  get('frequent-products').replaceChildren(...names.map(x => {
+    const option = document.createElement('option'); option.value=x.name; return option;
+  }));
+}
+function rememberProducts(products) {
+  if (!products.length) return;
+  for (const item of products) {
+    const id = normalizedName(item.name);
+    if (!id) continue;
+    const previous = frequent[id] || {name:item.name, uses:0};
+    frequent[id] = {name:item.name, uses:previous.uses+1};
+  }
+  try { localStorage.setItem(frequentKey,JSON.stringify(frequent)); } catch {}
+  updateFrequentList();
+}
 try { items = JSON.parse(localStorage.getItem(key) || '[]'); }
 catch { get('status').textContent = 'No se pudo recuperar la lista guardada.'; }
 
@@ -76,6 +100,7 @@ function displayProduct(name, quantity) {
 function render() {
   get('total').value = money.format(items.reduce((sum,item) => sum + Math.round(item.quantity * (item.cents ?? 0)),0) / 100);
   get('empty').hidden = items.length > 0;
+  get('new-purchase').hidden = items.length === 0;
   get('count').textContent = items.length ? items.filter(item => !item.bought).length + ' pendientes' : '';
   get('items').replaceChildren(...items.map(item => {
     const row = document.createElement('li');
@@ -120,11 +145,11 @@ function render() {
   }));
 }
 
-function update(next) {
+function update(next, message = '') {
   items = next;
   try {
     localStorage.setItem(key, JSON.stringify(items));
-    get('status').textContent = '';
+    get('status').textContent = message;
   } catch {
     get('status').textContent = 'Los cambios solo estarán disponibles mientras esta página siga abierta.';
   }
@@ -139,6 +164,13 @@ function resetForm() {
 }
 
 get('cancel').addEventListener('click', resetForm);
+get('new-purchase').addEventListener('click', () => {
+  if (!items.length) return;
+  if (!confirm('¿Comenzar una nueva compra? La lista se vaciará, pero recordaremos tus productos habituales.')) return;
+  rememberProducts(items);
+  update([], 'Lista lista para una nueva compra.');
+  resetForm();
+});
 get('entry').addEventListener('submit', event => {
   event.preventDefault();
   const name = get('name').value.trim();
@@ -149,10 +181,21 @@ get('entry').addEventListener('submit', event => {
   }
   const quantity = get('quantity').valueAsNumber;
   const cents = get('price').value === '' ? null : Math.round(get('price').valueAsNumber * 100);
+  if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(cents ?? 0) || (cents !== null && cents < 0)) {
+    get('status').textContent = 'Revisa la cantidad y el precio.'; return;
+  }
   const fields = {name,quantity,cents};
-  update(editing === null
-    ? [...items,{...fields,id:Date.now().toString(36) + Math.random().toString(36).slice(2),bought:false}]
-    : items.map(item => item.id === editing ? {...item,...fields} : item));
+  const duplicate = editing === null ? items.find(item => !item.bought && normalizedName(item.name) === normalizedName(name)) : null;
+  if (duplicate) {
+    // Agregar otra vez el mismo producto pendiente incrementa su cantidad.
+    update(items.map(item => item.id === duplicate.id
+      ? {...item, quantity:Math.round((item.quantity+quantity)*100)/100, cents:cents===null?item.cents:cents}
+      : item), 'Producto existente: cantidad actualizada.');
+  } else {
+    update(editing === null
+      ? [...items,{...fields,id:Date.now().toString(36) + Math.random().toString(36).slice(2),bought:false}]
+      : items.map(item => item.id === editing ? {...item,...fields} : item));
+  }
   resetForm();
   get('name').focus();
 });
@@ -227,15 +270,19 @@ dictate.addEventListener('click', () => {
   recognition.onerror = () => {
     get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
   };
-  recognition.onend = () => { dictate.disabled = false; };
+  recognition.onend = () => { dictate.disabled = false; dictate.classList.remove('listening'); dictate.setAttribute('aria-label','Dictar producto'); };
   try {
     recognition.start();
     dictate.disabled = true;
-    get('status').textContent = 'Escuchando…';
+    dictate.classList.add('listening');
+    dictate.setAttribute('aria-label','Escuchando');
+    get('status').textContent = 'Escuchando… habla ahora.';
   } catch {
+    dictate.disabled = false; dictate.classList.remove('listening');
     get('status').textContent = 'No se pudo iniciar el dictado.';
   }
 });
+updateFrequentList();
 render();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   navigator.serviceWorker.register('./sw.js').catch(() => {
