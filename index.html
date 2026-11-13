@@ -169,7 +169,7 @@ function fillFromSpeech(transcript) {
   get('status').textContent = parts && price === undefined
     ? 'Revisa el producto y escribe el precio.'
     : 'Revisa los datos antes de guardar.';
-  if (shouldAdd && editing === null && (!parts || price !== undefined)) {
+  if (editing === null && (!parts || price !== undefined)) {
     get('entry').requestSubmit();
   }
 }
