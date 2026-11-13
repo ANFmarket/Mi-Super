@@ -4,33 +4,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mi Súper</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#185841">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="./cart-192.png">
 <link rel="apple-touch-icon" href="./cart-192.png">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eff3ee;color:#19352c;font:16px system-ui,sans-serif}main{max-width:560px;margin:auto;padding:32px 20px}h1{font-size:2.5rem;margin:0 0 18px}h2{font-size:1.2rem}header,li,.actions{display:flex;align-items:center;justify-content:space-between;gap:12px}output{font-weight:700}form,li{background:white;border:1px solid #d2ddd4;border-radius:14px;padding:14px;margin-bottom:8px}label{display:grid;gap:4px}input,button{font:inherit;padding:9px;border:1px solid #9eafa5;border-radius:8px;min-width:0}button{cursor:pointer;color:#19352c;background:#fff}.primary{background:#185841;color:white}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}ul{list-style:none;padding:0}li label{display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}li .actions{gap:4px}small{display:block;color:#496359}[hidden]{display:none!important}
-header h1{display:flex;align-items:center;gap:10px}
-header h1 img{border-radius:10px}
-li label input:checked + span{text-decoration:line-through;text-decoration-thickness:2px}
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#344653;background:#f5f7f9;font-synthesis:none;--sky:#239dc8;--sky-soft:#e3f5fa;--line:#e1e7eb;--muted:#687782}
+*{box-sizing:border-box}body{margin:0;background:#f5f7f9;color:#344653;font-size:16px;line-height:1.45}main{max-width:620px;margin:0 auto;padding:24px 17px 55px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 20px}h1{font-size:clamp(1.7rem,5.6vw,2.15rem);letter-spacing:-.045em;margin:0;color:#3c4d58}header h1{display:flex;align-items:center;gap:10px;white-space:nowrap}header h1 img{border-radius:12px;box-shadow:0 1px 4px #a6b6bf33}h2{font-size:1.19rem;letter-spacing:-.015em;margin:24px 0 12px;color:#374a56}
+.total-card{padding:10px 14px;background:#e8f7fb;border:1px solid #c9eaf3;border-radius:15px;text-align:right;flex-shrink:0}.total-card small{color:#47758a;font-size:.72rem}.total-card output{display:block;font-size:1.27rem;font-weight:800;letter-spacing:-.03em;color:#167fa6;white-space:nowrap}
+form{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;box-shadow:0 5px 22px #253f4c09}label{display:grid;gap:7px;font-weight:600;font-size:.89rem}input:not([type=checkbox]),button{font:inherit;min-width:0}input:not([type=checkbox]){width:100%;height:45px;padding:10px 12px;border:1px solid #cbd6dc;border-radius:11px;background:#fff;color:#334752;outline-offset:2px}input:focus-visible,button:focus-visible{outline:3px solid #83d6ef;outline-offset:2px}input:not([type=checkbox]):focus{border-color:var(--sky)}input::placeholder{color:#9aa8b0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:14px 0 17px}
+button{cursor:pointer;border:1px solid #d3e0e6;background:#fff;color:#405765;border-radius:11px;min-height:43px;padding:10px 13px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background-color .15s,transform .12s}button:active{transform:scale(.985)}button:disabled{opacity:.58;cursor:wait}.primary{background:#229fca;color:#fff;border-color:#229fca}.primary:active{background:#177eaa}.voice{background:#e4f5fa;color:#127fa7;border-color:#bce7f3}.voice:disabled{background:#f0f3f5}.secondary{background:#f5f8fa}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}form>.actions{gap:9px}form>.actions button{flex:1 1 125px}
+.icon{width:18px;height:18px;flex-shrink:0;display:block;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}.voice .icon{width:20px;height:20px}
+#status{font-size:.9rem;color:#376e87;min-height:1.3em;margin:11px 4px 4px}#status:empty{min-height:0;margin:0}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.section-heading small{color:var(--muted);font-weight:500}#empty{color:var(--muted);background:#fff;border:1px dashed #d0dde4;border-radius:15px;padding:20px;text-align:center}
+ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 9px #243f4c06}li label{display:flex;align-items:center;gap:11px;flex:1;min-width:0;overflow-wrap:anywhere;cursor:pointer;font-size:1rem}li label input{appearance:none;flex:0 0 23px;width:23px;height:23px;border:2px solid #a6beca;border-radius:7px;margin:0;display:grid;place-content:center;cursor:pointer}li label input:checked{background:#27a3cc;border-color:#27a3cc}li label input:checked::after{content:'✓';font-size:16px;color:#fff;font-weight:800;line-height:1}li label input:checked + span{text-decoration:line-through;text-decoration-thickness:2px;color:#91a1ab}li label span{min-width:0;font-weight:650}li label small{display:block;color:#72828c;font-size:.79rem;font-weight:400;text-decoration:none}li .actions{gap:5px;flex-wrap:nowrap}li .actions button{padding:7px;min-height:37px;min-width:37px;border-radius:10px}li .actions button .icon{width:17px;height:17px}small{display:block;color:var(--muted)}[hidden]{display:none!important}.hint{margin:0 0 16px;font-size:.89rem;color:#71818c}
+@media(max-width:430px){main{padding:19px 12px 45px}form{padding:15px}header{align-items:center}header h1 img{width:36px;height:36px}.total-card{padding:8px 10px}.total-card output{font-size:1.07rem}li{padding:10px}li .actions button{min-width:35px;padding:7px}.fields{gap:9px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
 </style>
 <main>
-<header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div><small>Total estimado</small><output id="total"></output></div></header>
+<header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div class="total-card"><small>Total estimado</small><output id="total"></output></div></header>
 <form id="entry">
+<p class="hint">Tu lista de compras, fácil y a tu manera.</p>
 <label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche"></label>
 <div class="fields">
 <label>Cantidad<input id="quantity" type="number" min=".01" step=".01" max="99999" required value="1"></label>
 <label>Precio unitario (opcional)<input id="price" type="number" min="0" step=".01" max="999999" placeholder="$"></label>
 </div>
-<div class="actions"><button class="primary" id="save">Agregar</button><button id="dictate" type="button">Dictar producto</button><button id="cancel" type="button" hidden>Cancelar</button></div>
+<div class="actions"><button class="primary" id="save"><span class="icon-slot" data-icon="plus"></span><span class="button-label">Agregar</span></button><button class="voice" id="dictate" type="button"><span class="icon-slot" data-icon="mic"></span> Dictar producto</button><button class="secondary" id="cancel" type="button" hidden>Cancelar</button></div>
 </form>
 <p role="status" id="status"></p>
-<h2>Lista de compras</h2>
+<div class="section-heading"><h2>Lista de compras</h2><small id="count"></small></div>
 <p id="empty">Agrega el primer producto de tu lista.</p>
 <ul id="items"></ul>
 </main>
 <script>
 const get = id => document.getElementById(id);
 const key = 'mi-super-lista-v1';
+const iconPaths = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  mic: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/>',
+  pencil: '<path d="m16 5 3 3M4 20l4.5-1 11-11a2.12 2.12 0 0 0-3-3l-11 11L4 20Z"/>',
+  trash: '<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7"/>'
+};
+function icon(name) {
+  const holder = document.createElement('span');
+  holder.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + iconPaths[name] + '</svg>';
+  return holder.firstChild;
+}
+document.querySelectorAll('[data-icon]').forEach(slot => slot.replaceWith(icon(slot.dataset.icon)));
+function setSaveLabel(label) { get('save').querySelector('.button-label').textContent = label; }
+
 const money = new Intl.NumberFormat('es-MX', {style:'currency',currency:'MXN'});
 let items = [];
 let editing = null;
@@ -40,6 +62,7 @@ catch { get('status').textContent = 'No se pudo recuperar la lista guardada.'; }
 function render() {
   get('total').value = money.format(items.reduce((sum,item) => sum + Math.round(item.quantity * (item.cents ?? 0)),0) / 100);
   get('empty').hidden = items.length > 0;
+  get('count').textContent = items.length ? items.filter(item => !item.bought).length + ' pendientes' : '';
   get('items').replaceChildren(...items.map(item => {
     const row = document.createElement('li');
     const label = document.createElement('label');
@@ -56,18 +79,22 @@ function render() {
     const actions = document.createElement('div');
     actions.className = 'actions';
     const edit = document.createElement('button');
-    edit.textContent = 'Editar';
+    edit.append(icon('pencil'));
+    edit.title = 'Editar ' + item.name;
+    edit.setAttribute('aria-label', edit.title);
     edit.addEventListener('click', () => {
       editing = item.id;
       get('name').value = item.name;
       get('quantity').value = item.quantity;
       get('price').value = item.cents === null ? '' : item.cents / 100;
-      get('save').textContent = 'Guardar';
+      setSaveLabel('Guardar');
       get('cancel').hidden = false;
       get('name').focus();
     });
     const remove = document.createElement('button');
-    remove.textContent = 'Quitar';
+    remove.append(icon('trash'));
+    remove.title = 'Quitar ' + item.name;
+    remove.setAttribute('aria-label', remove.title);
     remove.addEventListener('click', () => {
       update(items.filter(product => product.id !== item.id));
       if (editing === item.id) resetForm();
@@ -92,7 +119,7 @@ function update(next) {
 function resetForm() {
   editing = null;
   get('entry').reset();
-  get('save').textContent = 'Agregar';
+  setSaveLabel('Agregar');
   get('cancel').hidden = true;
 }
 
@@ -180,47 +207,18 @@ dictate.addEventListener('click', () => {
     return;
   }
   const recognition = new Recognition();
-  const status = get('status');
-  let active = true;
   recognition.lang = 'es-MX';
-
-  function finish(message) {
-    if (!active) return false;
-    active = false;
-    clearTimeout(timeout);
-    dictate.disabled = false;
-    if (message) status.textContent = message;
-    return true;
-  }
-
-  const timeout = setTimeout(() => {
-    if (finish('El dictado agotó el tiempo. Toca para volver a intentar.')) {
-      recognition.abort();
-    }
-  }, 10000);
-
-  recognition.onaudiostart = () => {
-    if (active) status.textContent = 'Escuchando…';
+  recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
+  recognition.onerror = () => {
+    get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
   };
-  recognition.onresult = event => {
-    if (!finish()) return;
-    recognition.abort();
-    fillFromSpeech(event.results[event.resultIndex || 0][0].transcript);
-  };
-  recognition.onerror = event => {
-    const message = event.error === 'no-speech'
-      ? 'No se detectó voz. Toca para volver a intentar.'
-      : 'Falló el dictado (' + event.error + '). Puedes volver a intentar o escribir.';
-    finish(message);
-  };
-  recognition.onend = () => finish('El dictado terminó sin resultado. Toca para volver a intentar.');
-
-  dictate.disabled = true;
-  status.textContent = 'Iniciando dictado…';
+  recognition.onend = () => { dictate.disabled = false; };
   try {
     recognition.start();
+    dictate.disabled = true;
+    get('status').textContent = 'Escuchando…';
   } catch {
-    finish('No se pudo iniciar el dictado. Toca para volver a intentar.');
+    get('status').textContent = 'No se pudo iniciar el dictado.';
   }
 });
 render();
