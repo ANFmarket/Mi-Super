@@ -1,5 +1,5 @@
-const cacheName = 'mi-super-pwa-v3';
-const assets = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const cacheName = 'mi-super-pwa-v4';
+const assets = ['./', './index.html', './manifest.webmanifest', './cart-192.png', './cart-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(cacheName).then(cache => cache.addAll(assets)));

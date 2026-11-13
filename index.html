@@ -5,12 +5,16 @@
 <title>Mi Súper</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#185841">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./cart-192.png">
+<link rel="apple-touch-icon" href="./cart-192.png">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eff3ee;color:#19352c;font:16px system-ui,sans-serif}main{max-width:560px;margin:auto;padding:32px 20px}h1{font-size:2.5rem;margin:0 0 18px}h2{font-size:1.2rem}header,li,.actions{display:flex;align-items:center;justify-content:space-between;gap:12px}output{font-weight:700}form,li{background:white;border:1px solid #d2ddd4;border-radius:14px;padding:14px;margin-bottom:8px}label{display:grid;gap:4px}input,button{font:inherit;padding:9px;border:1px solid #9eafa5;border-radius:8px;min-width:0}button{cursor:pointer;color:#19352c;background:#fff}.primary{background:#185841;color:white}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}ul{list-style:none;padding:0}li label{display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}li .actions{gap:4px}small{display:block;color:#496359}[hidden]{display:none!important}
+header h1{display:flex;align-items:center;gap:10px}
+header h1 img{border-radius:10px}
+li label input:checked + span{text-decoration:line-through;text-decoration-thickness:2px}
 </style>
 <main>
-<header><h1>Mi Súper</h1><div><small>Total estimado</small><output id="total"></output></div></header>
+<header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div><small>Total estimado</small><output id="total"></output></div></header>
 <form id="entry">
 <label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche"></label>
 <div class="fields">
@@ -19,7 +23,7 @@
 </div>
 <div class="actions"><button class="primary" id="save">Agregar</button><button id="dictate" type="button">Dictar producto</button><button id="cancel" type="button" hidden>Cancelar</button></div>
 </form>
-<p role="status" id="status">Dictado v4</p>
+<p role="status" id="status"></p>
 <h2>Lista de compras</h2>
 <p id="empty">Agrega el primer producto de tu lista.</p>
 <ul id="items"></ul>
@@ -162,89 +166,32 @@ function fillFromSpeech(transcript) {
   const name = words.join(' ');
   get('name').value = name.charAt(0).toUpperCase()+name.slice(1);
   if (price !== undefined) get('price').value = price;
-  if (parts && price === undefined) {
-    get('status').textContent = 'Revisa el producto y escribe el precio.';
-  } else if (editing !== null) {
-    get('status').textContent = 'Revisa los datos antes de guardar.';
-  } else {
+  get('status').textContent = parts && price === undefined
+    ? 'Revisa el producto y escribe el precio.'
+    : 'Revisa los datos antes de guardar.';
+  if (shouldAdd && editing === null && (!parts || price !== undefined)) {
     get('entry').requestSubmit();
   }
 }
 
-let finishListening;
-
 dictate.addEventListener('click', () => {
-  if (finishListening) {
-    finishListening();
-    return;
-  }
   if (!Recognition) {
     get('status').textContent = 'El navegador no tiene dictado disponible. Puedes escribir el producto.';
     return;
   }
-
   const recognition = new Recognition();
   recognition.lang = 'es-MX';
-  recognition.continuous = false;
-  recognition.interimResults = false;
-  let receivedResult = false;
-  let timer;
-
-  function finish() {
-    clearTimeout(timer);
-    recognition.onresult = null;
-    recognition.onerror = null;
-    recognition.onend = null;
-    recognition.onspeechend = null;
-    finishListening = null;
-    dictate.textContent = 'Dictar producto';
-    dictate.disabled = false;
-  }
-
-  recognition.onresult = event => {
-    if (receivedResult) return;
-    receivedResult = true;
-    fillFromSpeech(event.results[event.resultIndex][0].transcript);
-    recognition.abort();
+  recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
+  recognition.onerror = () => {
+    get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
   };
-
-  recognition.onerror = event => {
-    if (!receivedResult) {
-      const detail = event.message ? ' — ' + event.message : '';
-      get('status').textContent = 'Error de dictado (' + event.error + ')' + detail;
-      receivedResult = true;
-    }
-  };
-
-  recognition.onend = () => {
-    if (!receivedResult) {
-      get('status').textContent = 'El dictado terminó sin texto. Toca Dictar producto para reintentar.';
-    }
-    finish();
-  };
-
-  finishListening = () => {
-    if (dictate.disabled) return;
-    dictate.disabled = true;
-    get('status').textContent = 'Procesando dictado…';
-    recognition.stop();
-  };
-  recognition.onspeechend = finishListening;
-  dictate.textContent = 'Terminar dictado';
-  get('status').textContent = 'Escuchando…';
-  timer = setTimeout(() => {
-    if (!receivedResult) {
-      get('status').textContent = 'El dictado agotó el tiempo. Toca Dictar producto para reintentar.';
-    }
-    finish();
-    recognition.abort();
-  }, 15000);
-
+  recognition.onend = () => { dictate.disabled = false; };
   try {
     recognition.start();
-  } catch (error) {
-    finish();
-    get('status').textContent = 'No se pudo iniciar el dictado (' + error.name + '): ' + error.message;
+    dictate.disabled = true;
+    get('status').textContent = 'Escuchando…';
+  } catch {
+    get('status').textContent = 'No se pudo iniciar el dictado.';
   }
 });
 render();
