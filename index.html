@@ -180,18 +180,47 @@ dictate.addEventListener('click', () => {
     return;
   }
   const recognition = new Recognition();
+  const status = get('status');
+  let active = true;
   recognition.lang = 'es-MX';
-  recognition.onresult = event => fillFromSpeech(event.results[0][0].transcript);
-  recognition.onerror = () => {
-    get('status').textContent = 'No se pudo usar el micrófono. Revisa el permiso o escribe el producto.';
+
+  function finish(message) {
+    if (!active) return false;
+    active = false;
+    clearTimeout(timeout);
+    dictate.disabled = false;
+    if (message) status.textContent = message;
+    return true;
+  }
+
+  const timeout = setTimeout(() => {
+    if (finish('El dictado agotó el tiempo. Toca para volver a intentar.')) {
+      recognition.abort();
+    }
+  }, 10000);
+
+  recognition.onaudiostart = () => {
+    if (active) status.textContent = 'Escuchando…';
   };
-  recognition.onend = () => { dictate.disabled = false; };
+  recognition.onresult = event => {
+    if (!finish()) return;
+    recognition.abort();
+    fillFromSpeech(event.results[event.resultIndex || 0][0].transcript);
+  };
+  recognition.onerror = event => {
+    const message = event.error === 'no-speech'
+      ? 'No se detectó voz. Toca para volver a intentar.'
+      : 'Falló el dictado (' + event.error + '). Puedes volver a intentar o escribir.';
+    finish(message);
+  };
+  recognition.onend = () => finish('El dictado terminó sin resultado. Toca para volver a intentar.');
+
+  dictate.disabled = true;
+  status.textContent = 'Iniciando dictado…';
   try {
     recognition.start();
-    dictate.disabled = true;
-    get('status').textContent = 'Escuchando…';
   } catch {
-    get('status').textContent = 'No se pudo iniciar el dictado.';
+    finish('No se pudo iniciar el dictado. Toca para volver a intentar.');
   }
 });
 render();
