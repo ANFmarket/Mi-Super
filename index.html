@@ -11,7 +11,7 @@
 :root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#344653;background:#f5f7f9;font-synthesis:none;--sky:#239dc8;--sky-soft:#e3f5fa;--line:#e1e7eb;--muted:#687782}
 *{box-sizing:border-box}body{margin:0;background:#f5f7f9;color:#344653;font-size:16px;line-height:1.45}main{max-width:620px;margin:0 auto;padding:24px 17px 55px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 20px}h1{font-size:clamp(1.7rem,5.6vw,2.15rem);letter-spacing:-.045em;margin:0;color:#3c4d58}header h1{display:flex;align-items:center;gap:10px;white-space:nowrap}header h1 img{border-radius:12px;box-shadow:0 1px 4px #a6b6bf33}h2{font-size:1.19rem;letter-spacing:-.015em;margin:24px 0 12px;color:#374a56}
-.total-card{padding:10px 14px;background:#e8f7fb;border:1px solid #c9eaf3;border-radius:15px;text-align:right;flex-shrink:0}.total-card small{color:#47758a;font-size:.72rem}.total-card output{display:block;font-size:1.27rem;font-weight:800;letter-spacing:-.03em;color:#167fa6;white-space:nowrap}
+.total-card{padding:10px 14px;background:#e8f7fb;border:1px solid #c9eaf3;border-radius:15px;text-align:right;flex-shrink:0}.total-card .total-title{display:flex;align-items:center;justify-content:flex-end;gap:6px}.total-card .total-title .icon{width:17px;height:17px;color:#167fa6}.total-card small{color:#47758a;font-size:.72rem}.total-card output{display:block;font-size:1.27rem;font-weight:800;letter-spacing:-.03em;color:#167fa6;white-space:nowrap}
 form{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;box-shadow:0 5px 22px #253f4c09}label{display:grid;gap:7px;font-weight:600;font-size:.89rem}input:not([type=checkbox]),button{font:inherit;min-width:0}input:not([type=checkbox]){width:100%;height:45px;padding:10px 12px;border:1px solid #cbd6dc;border-radius:11px;background:#fff;color:#334752;outline-offset:2px}input:focus-visible,button:focus-visible{outline:3px solid #83d6ef;outline-offset:2px}input:not([type=checkbox]):focus{border-color:var(--sky)}input::placeholder{color:#9aa8b0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:14px 0 17px}
 button{cursor:pointer;border:1px solid #d3e0e6;background:#fff;color:#405765;border-radius:11px;min-height:43px;padding:10px 13px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background-color .15s,transform .12s}button:active{transform:scale(.985)}button:disabled{opacity:.58;cursor:wait}.primary{background:#229fca;color:#fff;border-color:#229fca}.primary:active{background:#177eaa}.voice{background:#e4f5fa;color:#127fa7;border-color:#bce7f3}.voice:disabled{background:#f0f3f5}.secondary{background:#f5f8fa}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}form>.actions{gap:9px}form>.actions button{flex:1 1 125px}
 .icon{width:18px;height:18px;flex-shrink:0;display:block;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}.voice .icon{width:20px;height:20px}
@@ -21,7 +21,7 @@ ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;bo
 @media(prefers-reduced-motion:reduce){button{transition:none}}
 </style>
 <main>
-<header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div class="total-card"><small>Total estimado</small><output id="total"></output></div></header>
+<header><h1><img src="./cart-192.png" width="42" height="42" alt="">Mi Súper</h1><div class="total-card"><div class="total-title"><span class="icon-slot" data-icon="wallet"></span><small>Total estimado</small></div><output id="total"></output></div></header>
 <form id="entry">
 <p class="hint">Tu lista de compras, fácil y a tu manera.</p>
 <label>Producto<input id="name" required maxlength="120" placeholder="Ej. Leche"></label>
@@ -40,6 +40,7 @@ ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;bo
 const get = id => document.getElementById(id);
 const key = 'mi-super-lista-v1';
 const iconPaths = {
+  wallet: '<path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h15a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a3 3 0 0 1-3-3"/><path d="M22 13h-5a2 2 0 0 0 0 4h5"/><path d="M17 15h.01"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   mic: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/>',
   pencil: '<path d="m16 5 3 3M4 20l4.5-1 11-11a2.12 2.12 0 0 0-3-3l-11 11L4 20Z"/>',
@@ -59,6 +60,19 @@ let editing = null;
 try { items = JSON.parse(localStorage.getItem(key) || '[]'); }
 catch { get('status').textContent = 'No se pudo recuperar la lista guardada.'; }
 
+// Solamente adapta la presentación de las unidades; los datos y el dictado no cambian.
+function displayProduct(name, quantity) {
+  const match = name.match(/^\s*(?:kilos?|kilogramos?|kgs?\.?|litros?|lts?\.?|piezas?|pzas?\.?|paquetes?|cajas?|botellas?|gramos?|grs?\.?)\s+de\s+(.+)$/i);
+  if (!match) return {name, quantity: 'Cantidad: ' + quantity};
+  const unitWord = name.trim().split(/\s+/)[0].toLowerCase().replace(/\.$/, '');
+  const unit = /^(kilo|kilogramo|kg)/.test(unitWord) ? 'kg'
+    : /^(litro|lt)/.test(unitWord) ? 'L'
+    : /^(pieza|pza)/.test(unitWord) ? 'pzas.'
+    : /^(gramo|gr)/.test(unitWord) ? 'g'
+    : /^(paquete)/.test(unitWord) ? 'paquetes'
+    : /^(caja)/.test(unitWord) ? 'cajas' : 'botellas';
+  return {name: match[1].charAt(0).toUpperCase() + match[1].slice(1), quantity: 'Cantidad: ' + quantity + ' ' + unit};
+}
 function render() {
   get('total').value = money.format(items.reduce((sum,item) => sum + Math.round(item.quantity * (item.cents ?? 0)),0) / 100);
   get('empty').hidden = items.length > 0;
@@ -72,8 +86,9 @@ function render() {
     check.addEventListener('change', () => update(items.map(product => product.id === item.id ? {...product,bought:check.checked} : product)));
     const detail = document.createElement('span');
     const description = document.createElement('small');
-    detail.textContent = item.name;
-    description.textContent = item.quantity + (item.cents === null ? '' : ' × ' + money.format(item.cents / 100));
+    const shown = displayProduct(item.name, item.quantity);
+    detail.textContent = shown.name;
+    description.textContent = shown.quantity + (item.cents === null ? '' : ' · ' + money.format(item.cents / 100) + ' c/u');
     detail.append(description);
     label.append(check, detail);
     const actions = document.createElement('div');
