@@ -171,6 +171,7 @@ get('new-purchase').addEventListener('click', () => {
   update([], 'Lista lista para una nueva compra.');
   resetForm();
 });
+let submittingDictation = false;
 get('entry').addEventListener('submit', event => {
   event.preventDefault();
   const name = get('name').value.trim();
@@ -197,7 +198,7 @@ get('entry').addEventListener('submit', event => {
       : items.map(item => item.id === editing ? {...item,...fields} : item));
   }
   resetForm();
-  get('name').focus();
+  if (!submittingDictation) get('name').focus();
 });
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const dictate = get('dictate');
@@ -224,7 +225,12 @@ function fillFromSpeech(transcript) {
   const phrase = transcript.trim().replace(command, '').replace(/[.!?]+$/,'').trim();
   if (!phrase) {
     if (shouldAdd && editing === null && get('name').value.trim()) {
+      submittingDictation = true;
+    try {
       get('entry').requestSubmit();
+    } finally {
+      submittingDictation = false;
+    }
     } else {
       get('status').textContent = 'Primero dicta o escribe un producto.';
     }
@@ -255,7 +261,12 @@ function fillFromSpeech(transcript) {
     ? 'Revisa el producto y escribe el precio.'
     : 'Revisa los datos antes de guardar.';
   if (editing === null && (!parts || price !== undefined)) {
-    get('entry').requestSubmit();
+    submittingDictation = true;
+    try {
+      get('entry').requestSubmit();
+    } finally {
+      submittingDictation = false;
+    }
   }
 }
 
@@ -272,6 +283,7 @@ dictate.addEventListener('click', () => {
   };
   recognition.onend = () => { dictate.disabled = false; dictate.classList.remove('listening'); dictate.setAttribute('aria-label','Dictar producto'); };
   try {
+    document.activeElement?.blur();
     recognition.start();
     dictate.disabled = true;
     dictate.classList.add('listening');
