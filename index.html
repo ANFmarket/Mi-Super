@@ -35,7 +35,7 @@ ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}li{background:#fff;bo
 <div class="section-heading"><h2>Lista de compras</h2><div class="list-tools"><small id="count"></small><button id="new-purchase" type="button" class="secondary" hidden>Nueva compra</button></div></div>
 <p id="empty">Agrega el primer producto de tu lista.</p>
 <ul id="items"></ul>
-<footer style="margin:24px 0 0;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.15;text-align:center"><img src="./firma-anf.png" alt="ANF — Desarrollador de soluciones" width="155" height="44" style="width:155px;max-width:90%;height:auto;display:block"><small style="font-size:11px;color:#687782">Mi Súper · Versión 11</small></footer>
+<footer style="margin:24px 0 0;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.15;text-align:center"><img src="./firma-anf.png" alt="ANF — Desarrollador de soluciones" width="155" height="44" style="width:155px;max-width:90%;height:auto;display:block"><small style="font-size:11px;color:#687782">Mi Súper · Versión 12</small></footer>
 
 </main>
 <script>
@@ -272,7 +272,7 @@ function fillFromSpeech(transcript) {
   }
 }
 
-// iOS WebKit: explicitly release each recognition session, with a timeout.
+// iOS: allow the one-shot recognizer to finish normally before rearming.
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 let iosSession = null;
@@ -283,41 +283,37 @@ function dictateIOS() {
   recognition.lang = 'es-MX';
   recognition.continuous = false;
   recognition.interimResults = false;
-  let finished = false, closing = false, timeout, release;
-  function unlock() {
-    if (finished) return;
-    finished = true;
-    clearTimeout(timeout); clearTimeout(release);
+  let phrase = '', failed = false, ended = false, timeout, watchdog;
+  function finish() {
+    if (ended) return;
+    ended = true;
+    clearTimeout(timeout); clearTimeout(watchdog);
     recognition.onresult = recognition.onerror = recognition.onend = null;
-    iosSession = null;
-    dictate.disabled = false;
-    dictate.classList.remove('listening');
-    dictate.setAttribute('aria-label','Dictar producto');
-  }
-  function close() {
-    if (closing || finished) return;
-    closing = true;
-    clearTimeout(timeout);
-    release = setTimeout(unlock, 1200);
-    try { recognition.abort(); } catch { unlock(); }
+    try {
+      if (phrase) fillFromSpeech(phrase);
+      else if (!failed) get('status').textContent = 'No se reconoció un producto. Intenta otra vez.';
+    } finally {
+      setTimeout(() => {
+        iosSession = null;
+        dictate.disabled = false;
+        dictate.classList.remove('listening');
+        dictate.setAttribute('aria-label','Dictar producto');
+      }, 1000);
+    }
   }
   recognition.onresult = event => {
-    if (closing || finished) return;
+    if (ended || phrase) return;
     const result = event.results[event.resultIndex || 0];
     if (!result || result.isFinal === false) return;
-    const phrase = result[0].transcript;
-    try { fillFromSpeech(phrase); }
-    finally { close(); }
+    phrase = result[0].transcript;
+    get('status').textContent = 'Finalizando dictado…';
+    // Do not abort a successful recognition; wait for onend.
   };
   recognition.onerror = () => {
-    if (closing || finished) return;
-    get('status').textContent = 'No se pudo completar el dictado. Toca para intentar otra vez.';
-    close();
+    failed = true;
+    if (!phrase) get('status').textContent = 'No se pudo completar el dictado. Puedes escribir el producto.';
   };
-  recognition.onend = () => {
-    if (!closing && !finished) get('status').textContent = 'Dictado finalizado. Toca para intentar otra vez.';
-    unlock();
-  };
+  recognition.onend = finish;
   try {
     document.activeElement?.blur();
     dictate.disabled = true;
@@ -325,13 +321,18 @@ function dictateIOS() {
     dictate.setAttribute('aria-label','Escuchando');
     get('status').textContent = 'Escuchando… habla ahora.';
     timeout = setTimeout(() => {
-      get('status').textContent = 'Dictado agotó tiempo. Toca para dictar producto.';
-      close();
-    }, 12000);
+      try { recognition.stop(); } catch {}
+      if (!ended) watchdog = setTimeout(() => {
+        if (ended) return;
+        try { recognition.abort(); } catch {}
+        finish();
+      }, 3000);
+    }, 15000);
     recognition.start();
   } catch {
-    get('status').textContent = 'No se pudo iniciar el dictado. Intenta otra vez.';
-    close();
+    failed = true;
+    get('status').textContent = 'No se pudo iniciar el dictado. Puedes escribir el producto.';
+    finish();
   }
 }
 dictate.addEventListener('click', () => {
